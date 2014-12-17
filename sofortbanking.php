@@ -52,6 +52,7 @@ class Sofortbanking extends PaymentModule
 		$this->module_key = '65af9f83d2ae6fbe6dbdaa91d21f952a';
 		$this->currencies = true;
 		$this->currencies_mode = 'radio';
+		$this->is_eu_compatible = 1;
 		parent::__construct();
 		$this->page = basename(__FILE__, '.php');
 		$this->displayName = $this->l('sofortbanking');
@@ -74,7 +75,7 @@ class Sofortbanking extends PaymentModule
 			|| !Configuration::updateValue('SOFORTBANKING_BLOCK_LOGO', 'Y') || !Configuration::updateValue('SOFORTBANKING_CPROTECT', 'N')
 			|| !Configuration::updateValue('SOFORTBANKING_OS_ERROR', 8) || !Configuration::updateValue('SOFORTBANKING_OS_ACCEPTED', 5)
 			|| !Configuration::updateValue('SOFORTBANKING_OS_ERROR_IGNORE', 'N') || !Configuration::updateValue('SOFORTBANKING_OS_ACCEPTED_IGNORE', 'N')
-			|| !Configuration::updateValue('SOFORTBANKING_REDIRECT', 'N') || !$this->registerHook('payment')
+			|| !Configuration::updateValue('SOFORTBANKING_REDIRECT', 'N') || !$this->registerHook('payment') || ! $this->registerHook('displayPaymentEU')
 			|| !$this->registerHook('paymentReturn') || !$this->registerHook('leftColumn'))
 			return false;
 		return true;
@@ -233,6 +234,30 @@ class Sofortbanking extends PaymentModule
 		$this->context->smarty->assign('static_token', Tools::getToken(false));
 
 		return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
+	}
+	
+	public function hookDisplayPaymentEU($params)
+	{
+		$cprotect = Configuration::get('SOFORTBANKING_CPROTECT');
+		$lang = Language::getIsoById((int)$params['cart']->id_lang);
+		$mod_lang = $this->isSupportedLang();
+		
+		$logo = $this->_path . 'img/' . $mod_lang . '/';
+		
+		if (strtolower($cprotect) == 'y' && strtolower($lang) == 'de') {
+			$logo.= 'banner_400x100_ks.png';
+			$title = $this->l('Buy secure with customer protection by sofortbanking');
+		}
+		else {
+			$logo.= 'banner_300x100.png';
+			$title = $this->l('Pay easy and secure with SOFORT Banking.');
+		}
+		
+		return array(
+			'cta_text' => $title,
+			'logo' => $logo,
+			'action' => $this->context->link->getModuleLink($this->name, 'payment', array('token' => Tools::getToken(false), 'redirect' => true), true)
+		);
 	}
 
 	/**
