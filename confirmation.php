@@ -55,7 +55,7 @@ if (!Order::getOrderByCartId($cart->id) && ($order_state == Configuration::get('
 {
 	$sofortbanking->validateOrder($cart->id, $order_state, (float)number_format($cart->getOrderTotal(true, 3), 2, '.', ''),
 		$sofortbanking->displayName, null, null, null, false, $customer->secure_key, null);
-		Configuration::updateValue('SOFORTBANKING_CONFIGURATION_OK', true);
+	Configuration::updateValue('SOFORTBANKING_CONFIGURATION_OK', true);
 }
 
 $order_id = Order::getOrderByCartId($cart->id);

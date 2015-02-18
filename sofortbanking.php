@@ -236,25 +236,30 @@ class Sofortbanking extends PaymentModule
 		return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
 	}
 
+	/**
+	 * Build datas for eu payment hook
+	 *
+	 * @param array $params
+	 * @return array $result
+	 */
 	public function hookDisplayPaymentEU($params)
 	{
-		$cprotect = Configuration::get('SOFORTBANKING_CPROTECT');
-		$lang = Language::getIsoById((int)$params['cart']->id_lang);
-		$mod_lang = $this->isSupportedLang();
-		$logo = $this->_path . 'img/' . $mod_lang . '/';
-		if (strtolower($cprotect) == 'y' && strtolower($lang) == 'de') {
-			$logo.= 'banner_400x100_ks.png';
-			$title = $this->l('Buy secure with customer protection by sofortbanking');
-		}
-		else {
-			$logo.= 'banner_300x100.png';
-			$title = $this->l('Pay easy and secure with SOFORT Banking.');
-		}
-		return array(
-				'cta_text' => $title,
-				'logo' => $logo,
-				'action' => $this->context->link->getModuleLink($this->name, 'payment', array('token' => Tools::getToken(false), 'redirect' => true), true)
+		$lang = $this->isSupportedLang();
+		$result = array(
+				'cta_text' => null,
+				'logo' => null,
+				'action' => $this->context->link->getModuleLink($this->name, 'payment',
+						array('token' => Tools::getToken(false), 'redirect' => true), true)
 		);
+
+		if (Tools::strtolower(Configuration::get('SOFORTBANKING_CPROTECT')) == 'y' && Tools::strtolower($lang) == 'de')
+			$result = array_merge($result, array('logo' => $this->_path.'img/'.$lang.'/banner_400x100_ks.png',
+					'cta_text' => $this->l('Buy secure with customer protection by sofortbanking')));
+		else
+			$result = array_merge($result, array('logo' => $this->_path.'img/'.$lang.'/banner_300x100.png',
+					'cta_text' => $this->l('Pay easy and secure with SOFORT Banking.')));
+
+		return $result;
 	}
 
 	/**
