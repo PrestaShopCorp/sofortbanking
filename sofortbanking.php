@@ -53,6 +53,7 @@ class Sofortbanking extends PaymentModule
 		$this->currencies = true;
 		$this->currencies_mode = 'radio';
 		$this->is_eu_compatible = 1;
+		$this->controllers = array('payment');
 		parent::__construct();
 		$this->page = basename(__FILE__, '.php');
 		$this->displayName = $this->l('sofortbanking');
@@ -220,7 +221,7 @@ class Sofortbanking extends PaymentModule
 
 	/**
 	 * Build and display payment button
-	 * 
+	 *
 	 * @param array $params
 	 * @return string Templatepart
 	 */
@@ -319,7 +320,7 @@ class Sofortbanking extends PaymentModule
 	/**
 	 * Build and display payment page for PS 1.4
 	 *
-	 * This part is only for backward comatibility to PS 1.4 and 
+	 * This part is only for backward comatibility to PS 1.4 and
 	 * will be removed in one of the further module versions.
 	 */
 	public function backwardPaymentController()
