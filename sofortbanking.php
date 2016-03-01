@@ -53,6 +53,7 @@ class Sofortbanking extends PaymentModule
 		$this->currencies = true;
 		$this->currencies_mode = 'radio';
 		$this->is_eu_compatible = 1;
+		$this->controllers = array('payment');
 		parent::__construct();
 		$this->page = basename(__FILE__, '.php');
 		$this->displayName = $this->l('sofortbanking');
